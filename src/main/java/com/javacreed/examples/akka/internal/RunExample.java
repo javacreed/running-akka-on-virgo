@@ -19,35 +19,38 @@
  */
 package com.javacreed.examples.akka.internal;
 
-import java.util.Objects;
+import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import akka.actor.UntypedActor;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
 
-@Component("greetingActor")
-@Scope("prototype")
-public class GreetingActor extends UntypedActor {
+@Component
+public class RunExample {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GreetingActor.class);
-
-  private final GreetingService greetingService;
+  private static final Logger LOGGER = LoggerFactory.getLogger(RunExample.class);
 
   @Autowired
-  public GreetingActor(final GreetingService greetingService) {
-    this.greetingService = Objects.requireNonNull(greetingService);
-  }
+  private ActorSystem system;
 
-  @Override
-  public void onReceive(final Object message) throws Exception {
-    GreetingActor.LOGGER.debug("Recevied message: {}", message);
-    if (message instanceof Subject) {
-      greetingService.greet((Subject) message);
+  @PostConstruct
+  public void run() {
+    try {
+      RunExample.LOGGER.debug("Running example");
+      final ActorRef greeter = system.actorOf(SpringExtension.SpringExtProvider.get(system).props("greetingActor"),
+          "greeter");
+
+      RunExample.LOGGER.debug("Sending message");
+      greeter.tell(new Subject("Albert Attard"), greeter);
+      RunExample.LOGGER.debug("Message sent");
+    } catch (final Throwable e) {
+      RunExample.LOGGER.error("Failed to run example", e);
+    } finally {
+      RunExample.LOGGER.debug("Done");
     }
   }
-
 }

@@ -20,24 +20,27 @@
 package com.javacreed.examples.akka.internal;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import net.jcip.annotations.Immutable;
 
 @Immutable
-public class Greeting implements Serializable {
+public class Subject implements Serializable {
 
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -3250733488466794459L;
+  private static final long serialVersionUID = -3250733488466794459L;
 
-    private final String who;
+  private final String name;
 
-    public Greeting(final String who) {
-        this.who = who;
-    }
+  public Subject(final String name) {
+    this.name = Objects.requireNonNull(name);
+  }
 
-    public String getWho() {
-        return who;
-    }
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }
 }

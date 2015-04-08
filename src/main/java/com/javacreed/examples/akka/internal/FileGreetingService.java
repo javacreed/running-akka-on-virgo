@@ -19,34 +19,26 @@
  */
 package com.javacreed.examples.akka.internal;
 
-import java.util.Objects;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import akka.actor.UntypedActor;
+@Component("fileGreetingService")
+public class FileGreetingService implements GreetingService {
 
-@Component("greetingActor")
-@Scope("prototype")
-public class GreetingActor extends UntypedActor {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(GreetingActor.class);
-
-  private final GreetingService greetingService;
-
-  @Autowired
-  public GreetingActor(final GreetingService greetingService) {
-    this.greetingService = Objects.requireNonNull(greetingService);
-  }
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileGreetingService.class);
 
   @Override
-  public void onReceive(final Object message) throws Exception {
-    GreetingActor.LOGGER.debug("Recevied message: {}", message);
-    if (message instanceof Subject) {
-      greetingService.greet((Subject) message);
+  public void greet(final Subject subject) {
+    FileGreetingService.LOGGER.debug("Greeting: {}", subject);
+    try (PrintStream out = new PrintStream(new FileOutputStream("greetings.txt", true), true, "UTF-8")) {
+      out.printf("[%tF %<tT.%<tL] Hello %s%n", System.currentTimeMillis(), subject.getName());
+    } catch (final IOException e) {
+      FileGreetingService.LOGGER.error("Failed to greet: {}", subject, e);
     }
   }
 

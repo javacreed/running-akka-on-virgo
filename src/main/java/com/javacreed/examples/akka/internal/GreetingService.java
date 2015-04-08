@@ -19,27 +19,7 @@
  */
 package com.javacreed.examples.akka.internal;
 
-import org.osgi.framework.BundleContext;
+public interface GreetingService {
 
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.actor.Props;
-import akka.event.LoggingAdapter;
-import akka.osgi.ActorSystemActivator;
-
-public class ExampleActivator extends ActorSystemActivator {
-
-    @Override
-    public void configure(final BundleContext context, final ActorSystem system) {
-        final LoggingAdapter log = system.log();
-        log.debug("Configure");
-
-        final ActorRef greeter = system.actorOf(Props.create(GreetingActor.class), "greeter");
-
-        // 2. Send
-        log.debug("Sending message");
-        greeter.tell("Albert Attard", greeter);
-
-    }
-
+  void greet(Subject subject);
 }
